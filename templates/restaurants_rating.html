@@ -1,0 +1,98 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Страница подробного рейтинга</h2>
+                <h3>{{ restaurant_ratings.restaurant_name }}<br> {{ restaurant_ratings.address }}</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Общий индекс качества:</h3>
+                        <p style="font-size: 80px; font-weight: bold; text-align: center;">{{ overall_average_rating }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>График изменения рейтинга по месяцам</h3>
+                        <div class="col-md-6">
+                            <div style="width: 500px;">
+                                <canvas id="restaurantsRatingChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3>Отзывы</h3>
+                        {% for review in reviews %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ review.user.username }}</h5>
+                                    <p class="card-text">{{ review.review_text }}</p>
+                                    <p class="card-text">
+                                        Рейтинги:
+                                        Продукт - {{ review.product_quality_rating }},
+                                        Вкус - {{ review.taste_intensity_rating }},
+                                        Скорость доставки - {{ review.delivery_speed_rating }}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+
+            // Функция для получения данных о количестве заказов с отзывами и без отзывов
+            async function fetchRestaurantData() {
+                try {
+                    const response = await fetch('/api/restaurants-rating-data/'); // Замените на путь к вашему API endpoint
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            }
+
+            // Функция для отображения диаграммы заказов
+            function displayRestaurantChart(data) {
+                const ctx = document.getElementById('restaurantsRatingChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(restaurant => restaurant.name),
+                        datasets: [{
+                            label: 'Рейтинг ресторана',
+                            data: data.map(restaurant => restaurant.rating),
+                            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#00C49F', '#007BFF'], // Выберите цвета по своему усмотрению
+                            borderColor: ['#FF6384', '#36A2EB', '#FFCE56', '#00C49F', '#007BFF'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Вызов функции для получения данных и отображения диаграммы
+            const data = await fetchRestaurantData();
+            if (data) {
+                displayRestaurantChart(data);
+            }
+
+        });
+    </script>
+{% endblock %}

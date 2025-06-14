@@ -1,0 +1,94 @@
+{% extends "base_generic.html" %} {% block content %}
+<div class="container">
+  <h2>Мои заказы</h2>
+
+  {% if empty_orders %}
+  <div class="alert alert-info" role="alert">
+    <h4 class="alert-heading">Список заказов пуст!</h4>
+    <p>
+      У вас пока нет заказов. Вы можете сделать заказ, выбрав ресторан из
+      списка.
+    </p>
+    <hr />
+    <p class="mb-0">
+      <a href="{% url 'restaurant_list' %}" class="btn btn-primary"
+        >Перейти к ресторанам</a
+      >
+    </p>
+  </div>
+  {% else %}
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Дата заказа</th>
+        <th scope="col">Способ оплаты</th>
+        <th scope="col">Общая стоимость</th>
+        <th scope="col">Отзыв</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ order.created_at|date:"d.m.Y, H:i" }}</td>
+        <td>{{ order.get_payment_method_display }}</td>
+        <td>{{ order.total_price }}</td>
+        <td>
+          {% if order.have_review %} {% with review=order.reviews.first %}
+          <div class="review-info">
+            <p><strong>Отзыв:</strong> {{ review.review_text }}</p>
+            <p><strong>Оценки:</strong></p>
+            <ul>
+              <li>Скорость доставки: {{ review.delivery_speed_rating }}</li>
+              <li>Интенсивность вкуса: {{ review.taste_intensity_rating }}</li>
+              <li>Качество продукта: {{ review.product_quality_rating }}</li>
+            </ul>
+            <a
+              href="{% url 'rate_order' order.id %}"
+              class="btn btn-sm btn-warning"
+              >Редактировать отзыв</a
+            >
+          </div>
+          {% endwith %} {% else %}
+          <a
+            href="{% url 'rate_order' order.id %}"
+            class="btn btn-sm btn-primary"
+            >Оценить</a
+          >
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+<style>
+  .review-info {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+
+  .review-info p {
+    margin-bottom: 5px;
+  }
+
+  .review-info ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 10px;
+  }
+
+  .review-info li {
+    margin-bottom: 3px;
+  }
+
+  .review-info .btn {
+    margin-top: 10px;
+  }
+</style>
+{% endblock %}

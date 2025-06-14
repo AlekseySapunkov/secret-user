@@ -1,0 +1,43 @@
+{% extends 'base_generic.html' %}
+{% block content %}
+    <div class="container">
+        <h1 class="text-center mb-4 container__title">Меню ресторана</h1>
+        {% for category_name, dishes in grouped_dishes_by_category.items %}
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <h3>{{ category_name }}</h3>
+                </div>
+            </div>
+            <div class="row rounded-3">
+                {% for dish in dishes %}
+                    <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+                        <div class="h-100 dish">
+                            <div class="card-body">
+                                <img class="dish__image" src="{{ dish.pic.url }}" style="width: 200px">
+                                <h5 class="card-title">
+                                    <a class="dish__title"
+                                       href="{% url 'dish_detail_page' dish.pk %}">{{ dish.title }}</a>
+                                </h5>
+                                <p class="card-text">{{ dish.descr }}</p>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between bg-transparent dish__container border-top-0">
+                                <span class="badge rounded-pill align-self-center dish__price">
+                                    {% if dish.availability == 0 %}
+                                        (Не доступно)
+                                    {% else %}
+                                        {{ dish.price }}
+                                    {% endif %}
+                                </span>
+                                <a href="{% url 'add_to_cart' dish.pk %}" class="btn btn-primary dish__add-button">+</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% empty %}
+            <div class="col-12 text-center p-4">
+                <p>Нет доступных блюд.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}

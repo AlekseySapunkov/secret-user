@@ -1,0 +1,131 @@
+{% extends 'base_generic.html' %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3>Отчетный месяц</h3>
+        </div>
+        <div class="card-body">
+          <p>Май 2024</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="card">
+            <div class="card-header">
+              <h3>Выручка</h3>
+            </div>
+            <div class="card-body">
+              <p>За период</p>
+              <p>{{ report_data.revenue }} P</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card">
+            <div class="card-header">
+              <h3>Кол-во чеков</h3>
+            </div>
+            <div class="card-body">
+              <p>За период</p>
+              <p>{{ report_data.order_count }} шт.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card">
+            <div class="card-header">
+              <h3>Средний чек</h3>
+            </div>
+            <div class="card-body">
+              <p>За период</p>
+              <p>{{ report_data.average_order_value }} P</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h3>Рейтинги</h3>
+        </div>
+        <div class="card-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Ресторан</th>
+                <th>Рейтинг</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for rating in report_data.ratings %}
+              <tr>
+                <td>{{ rating.name }}</td>
+                <td>{{ rating.rating }}</td>
+              </tr>
+
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h3>MoM отчеты</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Ждем загрузки Chart.js
+  function waitForChart() {
+    if (typeof Chart !== "undefined") {
+      fetch("/api/revenue_chart_data/")
+        .then((response) => response.json())
+        .then((data) => {
+          const ctx = document.getElementById("revenueChart").getContext("2d");
+          new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: data.months,
+              datasets: [
+                {
+                  label: "Monthly Revenue",
+                  data: data.revenues,
+                  borderColor: "rgba(75, 192, 192, 1)",
+                  backgroundColor: "rgba(75, 192, 192, 0.2)",
+                },
+              ],
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            },
+          });
+        });
+    } else {
+      setTimeout(waitForChart, 100);
+    }
+  }
+  waitForChart();
+</script>
+{% endblock %}

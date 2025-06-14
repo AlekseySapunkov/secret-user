@@ -1,0 +1,53 @@
+{% extends "base_generic.html" %} {% block content %}
+<div class="container">
+  <h2>Оставить отзыв о ресторане {{ restaurant.name }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="{{ form.review_text.id_for_label }}">Отзыв:</label>
+      {{ form.review_text }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.interior_rating.id_for_label }}"
+        >Оценка интерьера (1-5):</label
+      >
+      {{ form.interior_rating }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.service_quality_rating.id_for_label }}"
+        >Качество обслуживания (1-5):</label
+      >
+      {{ form.service_quality_rating }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.product_quality_rating.id_for_label }}"
+        >Качество продукта (1-5):</label
+      >
+      {{ form.product_quality_rating }}
+    </div>
+
+    {% if is_secret_user %}
+    <div class="form-group">
+      <label for="{{ form.sanitation_level_rating.id_for_label }}"
+        >Уровень санитарии (1-5):</label
+      >
+      {{ form.sanitation_level_rating }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.problem_description.id_for_label }}"
+        >Описание проблемы:</label
+      >
+      {{ form.problem_description }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.improvement_suggestions.id_for_label }}"
+        >Предложения по улучшению:</label
+      >
+      {{ form.improvement_suggestions }}
+    </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Оставить отзыв</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base_generic.html" %} {% block content %}
+<h2>Выручка по ресторанам</h2>
+<!-- Выпадающий список для выбора отчетного месяца -->
+<div class="m-3 mx-5">
+  <label for="reportMonth" class="form-label">Отчетный месяц</label>
+  <select class="form-select" id="reportMonth">
+    <option value="" disabled selected>Выберите месяц...</option>
+    <option value="May 2024">Май 2024</option>
+  </select>
+</div>
+<div class="m-3 mx-5">
+  <label for="sortCriteria" class="form-label">Сортировка</label>
+  <select class="form-select form-select-lg" id="sortCriteria">
+    <option value="" disabled selected>Выберите критерий...</option>
+    <option value="revenue">По выручке</option>
+  </select>
+</div>
+<div class="mx-5">
+  <table>
+    <tbody>
+      {% for restaurant in restaurants %}
+      <div class="card">
+        <div class="card-body">
+          <p class="card-text">{{ restaurant.name }}</p>
+          <p class="card-text">
+            {{ restaurant.total_revenue | floatformat:2 }}
+          </p>
+        </div>
+      </div>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
