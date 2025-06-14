@@ -10,7 +10,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required as django_login_required
+from django.urls import reverse
 
 from DeliveryDjango import settings
 from DeliveryDjango.forms import OrderForm, RegistrationForm, LoginForm, ReviewForm, SecretUserReviewForm, SecretRestaurantReviewForm, RestaurantReviewForm
@@ -206,6 +207,15 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 
+def login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.warning(request, 'Оставлять отзывы могут только авторизованные пользователи')
+            return redirect(f"{reverse('login')}?next={request.path}")
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
 def login_view(request):
     form = LoginForm(request.POST or None)
     if form.is_valid():
@@ -214,8 +224,13 @@ def login_view(request):
         user = settings.authenticate(email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('restaurant_list')
-    return render(request, 'login.html', {'form': form})
+            next_url = request.GET.get('next', 'restaurant_list')
+            return redirect(next_url)
+    
+    return render(request, 'login.html', {
+        'form': form,
+        'title': 'Вход в систему'
+    })
 
 
 def generate_unique_pin():
